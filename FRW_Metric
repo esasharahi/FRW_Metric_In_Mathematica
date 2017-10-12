@@ -1,0 +1,43 @@
+(* esasharahi@gmail.com*)
+ClearAll["Global`*"]
+ManifoldDim = 4;
+g = {{-c^2, 0, 0, 0}, {0, (a[t])^2/(1 - K * \[Eta]^2), 0, 0}, {0, 
+    0, (a[t])^2 * \[Eta]^2, 0}, {0, 0, 
+    0, (a[t])^2 * \[Eta]^2 * (Sin[\[CurlyTheta]])^2}};
+gInv = Inverse[g];
+gDer = Array[gD, ManifoldDim];
+gDer[[1]] = D[g, t];
+gDer[[2]] = D[g, \[Eta]];
+gDer[[3]] = D[g, \[CurlyTheta]];
+gDer[[4]] = D[g, \[CurlyPhi]];
+LeviGamma = Array[LG, {ManifoldDim, ManifoldDim, ManifoldDim}];
+LG[i_, k_, l_] = (1/2)*
+   Sum[(Indexed[
+       gInv, {i, n}]*(Indexed[gDer, {l, n, k}] + 
+        Indexed[gDer, {k, n, l}] - Indexed[gDer, {n, l, k}])), {n, 1, 
+     ManifoldDim}];
+LeviGammaDer = Array[LGD, ManifoldDim];
+LGD[1] = D[LeviGamma, t];
+LGD[2] = D[LeviGamma, \[Eta]];
+LGD[3] = D[LeviGamma, \[CurlyTheta]];
+LGD[4] = D[LeviGamma,  \[CurlyPhi]];
+RiemannianR[m_, i_, j_, k_] = -Indexed[LeviGammaDer, {j, m, i, k}] +  
+   Indexed[LeviGammaDer, {k, m, i, j}] - 
+   Sum[Indexed[LeviGamma, {m, j, n}]*
+     Indexed[LeviGamma, {n, i, k}], {n, 1, ManifoldDim}] + 
+   Sum[Indexed[LeviGamma, {m, k, n}]*
+     Indexed[LeviGamma, {n, i, j}], {n, 1, ManifoldDim}];
+
+RiemannianRicci[i_, k_] = 
+  Sum[Indexed[LeviGammaDer, {l, l, i, k}], {l, 1, ManifoldDim}] - 
+   Sum[Indexed[LeviGammaDer, {k, l, i, l}], {l, 1, ManifoldDim}] + 
+   Sum[Sum[Indexed[LeviGamma, {m, i, k}]*
+      Indexed[LeviGamma, {l, l, m}], {l, 1, ManifoldDim}], {m, 1, 
+     ManifoldDim}] - 
+   Sum[Sum[Indexed[LeviGamma, {m, i, l}]*
+      Indexed[LeviGamma, {l, k, m}], {l, 1, ManifoldDim}], {m, 1, 
+     ManifoldDim}];
+
+RiemannianScalar = 
+  Sum[Sum[Indexed[gInv, {i, j}]*RiemannianRicci[i, j], {i, 1, 
+     ManifoldDim}], {j, 1, ManifoldDim}];
