@@ -1,0 +1,9 @@
+
+(* esasharahi@gmail.com*)
+ClearAll["Global`*"]
+ManifoldDim = 4;
+x := Table[Symbol["x" <> ToString@i], {i, 1, ManifoldDim }]
+
+TBracket[F_, G_] = 
+ F . D[G, {x}, NonConstants -> {G}] -  
+  G . D[F, {x}, NonConstants -> {F}] 
